@@ -17,4 +17,5 @@ Scripts: = scripts used for analysis, .Rev files are RevBayes scripts used for c
 ## edits-only
 * Contains outputs form the RNA editing detection for each species. 
 
-
+## Assemblies
+* This folder contains the annotated chloroplast assemblies for all speices in this study, excluding those that were already in genbank (see paper for Genbank accession numbers). these are all .gb files and can be viewed in something like Geneious.
