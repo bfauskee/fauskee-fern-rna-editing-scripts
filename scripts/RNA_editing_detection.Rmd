@@ -113,7 +113,7 @@ A_shastense_final_r <- cbind(A_shastense_final_r, num_codons)
 A_shastense_final_r <- A_shastense_final_r %>% rename(codon = num_codons)
 A_shastense_final_r$position <- A_shastense_final_r$position - 100
 ```
-
+Manually hard-coded the codon table. May require adjustments if user expects a different genetic code to apply
 ```{r}
 A_shastense_final_r$AA_change <- case_when(A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTT" ~ "Leu-to-Phe",
    A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTA" ~ "Leu-to-Phe",
