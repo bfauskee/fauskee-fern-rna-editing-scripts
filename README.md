@@ -14,7 +14,7 @@ Scripts: = scripts used for analysis, .Rev files are RevBayes scripts used for c
 * **RNA_editing_detection.sh** This script uses our chloroplast coding genes, maps RNA to them and outputs a .tsv noting the number of reads mapped to each site in each sample as well as the how many of each nucleotide map to the reference. This tsv output is used with the R script which will identify and characterize the RNA editing sites. This is a linux pipeline. The commands can easily be placed in a slurm (or other scheduler) script for use on a high-performance cluster. This is adapted from Edera and Sanchez-Puerta 2021 with minor modifications
 * **RNA_editing_detection.Rmd**: This R markdown script is designed to be run locally (or on a server if needed) on the .tsv output from RNA_editing_detection.sh. It will output several .csv files. Importantly, it outputs one file with all detected RNA edits and includes the type of edit (C-to-U or U-to-C), the codon position of the edit, the codon sequence, the amino acid change produced by the editing event and also include the gene and postion of each edit.  
 
+## edits-only
+* Contains outputs form the RNA editing detection for each species. 
 
-assemlbies.zip = annotated genbank format plastid assemblies used here
 
-edits-only.zip = spreadsheets with all detected rna edits for all species analyzed here
