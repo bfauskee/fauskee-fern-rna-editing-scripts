@@ -1,0 +1,212 @@
+---
+title: "RNA_editing_detection"
+author: "Blake Fauskee"
+date: "5/5/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+output: html_document
+knitr:
+  opts_chunk:
+    error: TRUE
+```
+```{r}
+library(dplyr)
+```
+Adiantum shastense used as reference here, replace A_shastense with species descriptor
+Now identify edits. Here create a new column and identify C-to-U and U-to-C RNA editing sites with a 10% threshold.
+
+
+```{r}
+A_shastense$edit <- ifelse( A_shastense$ref == "C" & A_shastense$t/A_shastense$coverage > 0.10, "c-to-u", ifelse( A_shastense$ref == "T" & A_shastense$c/A_shastense$coverage > 0.10, "u-to-c", "no"))
+```
+Make subset of data with only CDS
+```{r}
+A_shastense_cds <- A_shastense[!grepl("trn", A_shastense$gene),]
+```
+
+Now we need to get then length of the gene so we can denote the last 100 bases as also noncoding. Here, a is the last row of the gene, b is the value in the position column of a and then we put that value in a new column called "gene_length"
+```{r}
+A_shastense_gene_lengths <- A_shastense_cds %>% count(gene)
+as.data.frame(A_shastense_gene_lengths)
+A_shastense_cds <- merge(A_shastense_cds, A_shastense_gene_lengths, by = "gene")
+```
+```{r}
+A_shastense_cds <- A_shastense_cds %>% rename(gene_length = n)
+```
+Adapt this code if subsetting is needed. This removes bad genes from the original dataset, they will be added back in later.
+
+
+A_shastense_cds_b <- subset(A_shastense_cds, gene=="chlL")
+A_shastense_cds <- subset(A_shastense_cds, gene!="chlL")
+
+
+A_shastense_cds_b <- subset(A_shastense_cds, gene=="chlL" | gene=="rpl23" | gene=="chlL")
+A_shastense_cds <- subset(A_shastense_cds, gene!="ndhB")
+A_shastense_cds <- subset(A_shastense_cds, gene!="rpl23")
+A_shastense_cds <- subset(A_shastense_cds, gene!="chlL")
+
+
+Manually input intron ranges
+
+
+A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 215 & A_shastense_cds$position <= 414, "intron", 
+
+For a plastome analysis, use this block (adjust as needed)
+```{r}
+
+A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "ycf3" & A_shastense_cds$position >= 226 & A_shastense_cds$position <= 961, "intron", ifelse(A_shastense_cds$gene == "ycf3" & A_shastense_cds$position >= 1191 & A_shastense_cds$position <= 1815, "intron", ifelse(A_shastense_cds$gene == "clpP" & A_shastense_cds$position >= 172 & A_shastense_cds$position <= 899, "intron",  ifelse(A_shastense_cds$gene == "clpP" & A_shastense_cds$position >= 1192 & A_shastense_cds$position <= 1786, "intron", ifelse(A_shastense_cds$gene == "petD" & A_shastense_cds$position >= 109 & A_shastense_cds$position <= 740, "intron", ifelse(A_shastense_cds$gene == "atpF" & A_shastense_cds$position >= 246 & A_shastense_cds$position <= 964, "intron", ifelse(A_shastense_cds$gene == "petB" & A_shastense_cds$position >= 108 & A_shastense_cds$position <= 818, "intron", ifelse(A_shastense_cds$gene == "rpoC1" & A_shastense_cds$position >= 533 & A_shastense_cds$position <= 1205, "intron", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 218 & A_shastense_cds$position <= 417, "intron", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 650 & A_shastense_cds$position <= 1205, "intron", ifelse(A_shastense_cds$gene == "ndhA" & A_shastense_cds$position >= 659 & A_shastense_cds$position <= 1553, "intron", ifelse(A_shastense_cds$gene == "ndhB" & A_shastense_cds$position >= 827 & A_shastense_cds$position <= 1680, "intron", ifelse(A_shastense_cds$gene == "rpl16" & A_shastense_cds$position >= 107 & A_shastense_cds$position <= 506, "intron", ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 498 & A_shastense_cds$position <= 1246, "intron", "exon"))))))))))))))))
+```
+rpl2
+ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 498 & A_shastense_cds$position <= 1145, "intron",
+rpl16
+ifelse(A_shastense_cds$gene == "rpl16" & A_shastense_cds$position >= 110 & A_shastense_cds$position <= 912, "intron",
+ndh genes
+ifelse(A_shastense_cds$gene == "ndhA" & A_shastense_cds$position >= 659 & A_shastense_cds$position <= 1680, "intron"
+ifelse(A_shastense_cds$gene == "ndhB" & A_shastense_cds$position >= 824 & A_shastense_cds$position <= 1729, "intron",
+rps12, add if annotated
+ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 215 & A_shastense_cds$position <= 414, "intron",
+rps16, if annotated
+ifelse(A_shastense_cds$gene == "rps16" & A_shastense_cds$position >= 143 & A_shastense_cds$position <= 897, "intron", 
+For a mitochondiral analysis, use this block (adjust as needed)
+rps16, add if annotated
+ifelse(A_shastense_cds$gene == "rps16" & A_shastense_cds$position >= 143 & A_shastense_cds$position <= 939, "intron",
+ycf66
+ifelse(A_shastense_cds$gene == "ycf66" & A_shastense_cds$position >= 206 & A_shastense_cds$position <= 931, "intron",
+A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 362 & A_shastense_cds$position <= 1791, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 1928 & A_shastense_cds$position <= 5215, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 5299 & A_shastense_cds$position <= 6969, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 7162 & A_shastense_cds$position <= 11062, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 11122 & A_shastense_cds$position <= 15055, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 257 & A_shastense_cds$position <= 1851, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 2238 & A_shastense_cds$position <= 5067, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 5235 & A_shastense_cds$position <= 7251, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 7825 & A_shastense_cds$position <= 9777, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 331 & A_shastense_cds$position <= 1397, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 2410 & A_shastense_cds$position <= 3666, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 3880 & A_shastense_cds$position <= 11251, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 11645 & A_shastense_cds$position <= 12231, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 241 & A_shastense_cds$position <= 1348, "intron",ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 1418 & A_shastense_cds$position <= 2708, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 3186 & A_shastense_cds$position <= 4658, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 4893 & A_shastense_cds$position <= 8186, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 565 & A_shastense_cds$position <= 4023, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 4539 & A_shastense_cds$position <= 7376, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 7780 & A_shastense_cds$position <= 11069, "intron", ifelse(A_shastense_cds$gene == "rps3" & A_shastense_cds$position >= 175 & A_shastense_cds$position <= 2359, "intron", ifelse(A_shastense_cds$gene == "rps3" & A_shastense_cds$position >= 2648 & A_shastense_cds$position <= 4890, "intron", ifelse(A_shastense_cds$gene == "ccmFC" & A_shastense_cds$position >= 1036 & A_shastense_cds$position <= 2716, "intron", ifelse(A_shastense_cds$gene == "cox1" & A_shastense_cds$position >= 725 & A_shastense_cds$position <= 1840, "intron",ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 530 & A_shastense_cds$position <= 1284, "intron", "exon")))))))))))))))))))))))))))
+
+
+A_shastense_cds_b$genic_region <-  ifelse(A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position < 101, "UTR", ifelse(A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position > 979, "UTR", "exon"))
+A_shastense_cds <- rbind(A_shastense_cds, A_shastense_cds_b)
+
+
+If subsetting is needed, due to less than 100bp flanking regions on either side or simple misannotation, adapt the below code.
+
+A_shastense_cds_b$genic_region <-  ifelse(A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position < 94, "UTR", ifelse(A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position >= 820 & A_shastense_cds_b$position <= 1604, "intron", ifelse(A_shastense_cds_b$gene == "rpl23" & A_shastense_cds_b$position < 46, "UTR", ifelse( A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 16, "UTR", ifelse( A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 100, "UTR", ifelse( A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position < 101, "UTR", ifelse( A_shastense_cds_b$gene == "rpl23" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 100,  "UTR", "exon")))))))
+A_shastense_cds <- rbind(A_shastense_cds, A_shastense_cds_b)
+
+
+Now identify coding sections of the gene. In most cases this will involve only denoting the first and last 100 bases as noncoding. Could be more difficult with multi-exon genes.
+```{r}
+A_shastense_cds$coding <- ifelse( A_shastense_cds$genic_region == "UTR", "noncoding", ifelse( A_shastense_cds$genic_region == "intron", "noncoding", "coding"))
+```
+Make a subset of only coding regions. This will help with automation of AA change detection
+```{r}
+A_shastense_cds_coding <- subset(A_shastense_cds, coding!="noncoding")
+```
+Now we need to combine the ref values of every three rows to get the codon triplets
+```{r}
+A_shastense_codons <- as.data.frame(t(sapply(seq(1, nrow(A_shastense_cds_coding), by = 3), function(i)apply(A_shastense_cds_coding[i:(i+2),], 2, paste, collapse=""))))
+A_shastense_codons <- A_shastense_codons[,3, drop=FALSE]
+A_shastense_codons <- A_shastense_codons[rep(seq_len(nrow(A_shastense_codons)), each = 3), ]
+A_shastense_codons <- as.data.frame(A_shastense_codons)
+names(A_shastense_codons)[1] <- "codon_seq"
+A_shastense_codons <- as.data.frame(A_shastense_codons)
+A_shastense_final_r <- cbind(A_shastense_cds_coding, A_shastense_codons)
+num_codons <- rep(c(1,2,3), times=(count(A_shastense_final_r)/3))
+num_codons <- as.data.frame(num_codons)
+A_shastense_final_r <- cbind(A_shastense_final_r, num_codons)
+A_shastense_final_r <- A_shastense_final_r %>% rename(codon = num_codons)
+A_shastense_final_r$position <- A_shastense_final_r$position - 100
+```
+
+```{r}
+A_shastense_final_r$AA_change <- case_when(A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTT" ~ "Leu-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTA" ~ "Leu-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTC" ~ "Leu-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CTG" ~ "Leu-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CCT" ~ "Pro-to-Ser",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CCC" ~ "Pro-to-Ser",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CCA" ~ "Pro-to-Ser",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CCG" ~ "Pro-to-Ser",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CAT" ~ "His-to-Tyr",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CAC" ~ "His-to-Tyr",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CAA" ~ "Gln-to-STOP",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CAG" ~ "Gln-to-STOP",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CGT" ~ "Arg-to-Cys",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CGC" ~ "Arg-to-Cys",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CGA" ~ "Arg-to-STOP",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "CGG" ~ "Arg-to-Trp",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TCT" ~ "Ser-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TCC" ~ "Ser-to-Phe",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TCA" ~ "Ser-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TCG" ~ "Ser-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CCT" ~ "Pro-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CCC" ~ "Pro-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CCA" ~ "Pro-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CCG" ~ "Pro-to-Leu",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ACT" ~ "Thr-to-Ile",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ACC" ~ "Thr-to-Ile",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ACA" ~ "Thr-to-Ile",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ACG" & A_shastense_final_r$position != "2" ~ "Thr-to-Met",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$position == "2" & A_shastense_final_r$codon_seq == "ACG" ~ "Thr-to-Met (Start Codon)",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GCT" ~ "Ala-to-Val",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GCC" ~ "Ala-to-Val",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GCA" ~ "Ala-to-Val",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GCG" ~ "Ala-to-Val",
+   A_shastense_final_r$edit == "c-to-u" & A_shastense_final_r$codon == "3" ~ "Silent",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TTT" ~ "Phe-to-Leu",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TTC" ~ "Phe-to-Leu",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TTA" ~ "Silent",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TTG" ~ "Silent",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TCT" ~ "Ser-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TCC" ~ "Ser-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TCA" ~ "Ser-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TCG" ~ "Ser-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TAT" ~ "Tyr-to-His",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TAC" ~ "Tyr-to-His",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TAA" ~ "STOP-to-Gln",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TAG" ~ "STOP-to-Gln",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TGT" ~ "Cys-to-Arg",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TGC" ~ "Cys-to-Arg",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TGA" ~ "STOP-to-Arg",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "1" & A_shastense_final_r$codon_seq == "TGG" ~ "Trp-to-Arg",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TTT" ~ "Phe-to-Ser",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TTC" ~ "Phe-to-Ser",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TTA" ~ "Leu-to-Ser",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "TTG" ~ "Leu-to-Ser",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CTT" ~ "Leu-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CTC" ~ "Leu-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CTA" ~ "Leu-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "CTG" ~ "Leu-to-Pro",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ATT" ~ "Ile-to-Thr",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ATC" ~ "Ile-to-Thr",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ATA" ~ "Ile-to-Thr",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "ATG" ~ "Ile-to-Met",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GTT" ~ "Val-to-Ala",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GTC" ~ "Val-to-Ala",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GTA" ~ "Val-to-Ala",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "2" & A_shastense_final_r$codon_seq == "GTG" ~ "Val-to-Ala",
+   A_shastense_final_r$edit == "u-to-c" & A_shastense_final_r$codon == "3" ~ "Silent",
+   TRUE ~ "NA")
+```
+
+```{r}
+write.csv(A_shastense_final_r, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_final_r.csv")
+```
+
+Now go after the non coding editing sites
+```{r}
+A_shastense_noncoding <- A_shastense_cds[!grepl("no", A_shastense_cds$edit),]
+A_shastense_noncoding <- A_shastense_noncoding[!grepl("exon", A_shastense_noncoding$genic_region),]
+write.csv(A_shastense_noncoding, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_final_r_noncoding.csv")
+```
+
+And now the tRNAs
+```{r}
+A_shastense_tRNA <- A_shastense[grepl("^trn", A_shastense$gene),]
+A_shastense_tRNA <- A_shastense_tRNA[!grepl("no", A_shastense_tRNA$edit),]
+write.csv(A_shastense_tRNA, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_tRNA_r.csv")
+```
+
+Let's create another file containing only the edits
+```{r}
+A_shastense_editsonly <- A_shastense_final_r[!grepl("no", A_shastense_final_r$edit),]
+
+write.csv(A_shastense_editsonly, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_editsonly.csv")
+```
+

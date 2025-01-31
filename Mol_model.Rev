@@ -1,0 +1,33 @@
+#Molecular q
+sf ~ dnDirichlet(v(1, 1, 1, 1))
+
+#Next exchangeabilities also drawn from a dirichlet dist.
+er ~ dnDirichlet(v(1, 1, 1, 1, 1, 1))
+
+#append the moves to estimate these
+moves.append( mvSimplexElementScale(er, alpha=10.0, weight=5.0) )
+moves.append( mvSimplexElementScale(sf, alpha=10.0, weight=5.0) )
+
+#Now create the matrix
+#Note: This just defines GTR, if you want to add invariant sites or gamma rate
+#heterogeneity, do this outsde the model
+Q_rbcL := fnGTR(er,sf)
+
+#Invariant sites
+pinvar ~ dnBeta(1,1)
+moves.append( mvBetaProbability(pinvar) )
+
+#gamma rate heterogeneity
+
+#Create gamma dist of rate categories
+#Gamma distributions have shape parameters (alpha), we draw these values from an exponential distribution
+alpha_rbcL ~ dnExponential( 1.0 )
+#add moves, we add several different lambdas so we can take big, medium, and small moves int he space
+#aids in better mixing
+moves.append( mvScale(alpha_rbcL, lambda=0.01, weight=1.0) )
+moves.append( mvScale(alpha_rbcL, lambda=0.1,  weight=1.0) )
+moves.append( mvScale(alpha_rbcL, lambda=1,    weight=1.0) )
+
+rates_rbcL := fnDiscretizeGamma( alpha_rbcL, alpha_rbcL, 4 )
+phySeq ~ dnPhyloCTMC(tree=bd_tree, Q=Q_rbcL, siteRates=rates_rbcL, branchRates=branch_rates_rbcL, pInv=pinvar, type="DNA")
+phySeq.clamp(rbcL)

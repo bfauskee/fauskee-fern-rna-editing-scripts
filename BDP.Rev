@@ -1,0 +1,27 @@
+#Birth-Death Process for Node Age estimation
+#First, code the Birth-Death Process
+speciation_rate ~ dnExponential(10)
+extinction_rate ~ dnExponential(10)
+
+moves.append( mvScale(speciation_rate, lambda=0.01, weight=1) )
+moves.append( mvScale(speciation_rate, lambda=0.1,  weight=1) )
+moves.append( mvScale(speciation_rate, lambda=1.0,  weight=1) )
+
+moves.append( mvScale(extinction_rate, lambda=0.01, weight=1) )
+moves.append( mvScale(extinction_rate, lambda=0.1,  weight=1) )
+moves.append( mvScale(extinction_rate, lambda=1,    weight=1) )
+
+#diversification := speciation_rate - extinction_rate
+#turnover := extinction_rate/speciation_rate
+
+#There are about 600 vittarioid and adiantum speices, my tree has 18 so let's add rho
+#the prob. of sampling extant taxa
+rho <- 0.03
+root_age <- 1
+
+#Now, we can get the birth_death tree distribution
+bd_tree ~ dnBDP(lambda=speciation_rate, mu=extinction_rate, rho=rho, rootAge=root_age,taxa=taxa)
+#use dnBDP here
+bd_tree.setValue(topology)
+
+moves.append( mvNodeTimeSlideUniform(bd_tree, weight=40.0) )

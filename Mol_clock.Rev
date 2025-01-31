@@ -1,0 +1,24 @@
+#Molecular Clock Model
+#Add a clock rate, can be a separate .Rev file
+#here we will use an uncorrelated log-normal clock rate
+#mean of the lognormal distribution
+ucln_mean_rbcL ~ dnExponential(2.0)
+
+#also creating a stochastid node that is exponentially distributed
+#for the standard distribution
+ucln_sigma_rbcL ~ dnExponential(3.0)
+#also adding a deterministic node for variance, which is simple SD squared
+ucln_var_rbcL := ucln_sigma_rbcL * ucln_sigma_rbcL
+
+#add moves for lognormal mean and variation
+moves.append( mvScale(ucln_mean_rbcL, lambda=1.0, tune=true, weight=4.0))
+moves.append( mvScale(ucln_sigma_rbcL, lambda=0.5, tune=true, weight=4.0))
+
+#add for loop to sample these parameters on each branch
+for(i in 1:n_branches){
+   branch_rates_rbcL[i] ~ dnLnorm(ucln_mean_rbcL, ucln_sigma_rbcL)
+   moves.append( mvScale(branch_rates_rbcL[i], lambda=1, tune=true, weight=2.0))
+}
+moves.append( mvVectorScale(branch_rates_rbcL,lambda=1.0,tune=true,weight=2.0) )
+moves.append( mvVectorSingleElementScale(branch_rates_rbcL,lambda=30.0,tune=true,weight=1.0) )
+mean_rt_rbcL := mean(branch_rates_rbcL) 

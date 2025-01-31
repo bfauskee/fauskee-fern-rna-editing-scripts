@@ -1,0 +1,21 @@
+#Morphological Clock Model
+ucln_mean_morpho ~ dnExponential(2.0)
+
+#also creating a stochastid node that is exponentially distributed
+#for the standard distribution
+ucln_sigma_morpho ~ dnExponential(3.0)
+#also adding a deterministic node for variance, which is simple SD squared
+ucln_var_morpho := ucln_sigma_morpho * ucln_sigma_morpho
+
+#add moves for lognormal mean and variation
+moves.append( mvScale(ucln_mean_morpho, lambda=1.0, tune=true, weight=4.0))
+moves.append( mvScale(ucln_sigma_morpho, lambda=0.5, tune=true, weight=4.0))
+
+
+for(i in 1:n_branches){
+   branch_rates_morpho[i] ~ dnLnorm(ucln_mean_morpho, ucln_sigma_morpho)
+   moves.append( mvScale(branch_rates_morpho[i], lambda=1, tune=true, weight=2.0))
+}
+
+moves.append( mvVectorScale(branch_rates_morpho,lambda=1.0,tune=true,weight=2.0) )
+moves.append( mvVectorSingleElementScale(branch_rates_morpho,lambda=30.0,tune=true,weight=1.0) )

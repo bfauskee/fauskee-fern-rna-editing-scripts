@@ -1,0 +1,43 @@
+#Master Rev mcmc
+
+#Read in Data and Tree
+
+rbcL <- readDiscreteCharacterData("vit_rbcL.nex")
+morpho <- readDiscreteCharacterData("vit_all_edits_pruned.nex")
+tree <- readTrees("pter_um_pruned.tre")[1]
+topology <- tree
+#Initialize the moves vector
+moves = VectorMoves()
+
+#Create helper variables
+n_taxa = rbcL.ntaxa()
+n_branches = 2 * n_taxa -2
+taxa = rbcL.taxa()
+
+source("scripts/BDP.Rev") # FBD tree prior
+source("scripts/Morph_clock.Rev") #Morphological clock prior
+source("scripts/Mol_clock.Rev") #Molecular clock prior
+source("scripts/Mol_model.Rev") #Molecular substitution model (GTR+I+G)
+source("scripts/Morph_model.Rev") #Morphological change model
+
+
+#Define our model now by attaching it to one node
+mymodel = model(sf)
+
+#setup monitors
+
+#initialize the monitors variable
+monitors = VectorMonitors()
+
+#monitor for saving our log
+monitors.append( mnModel(filename="vit-bdp-pruned.log", printgen=100) )
+#tree topology not included in the log so lets make a monitor to save that
+#topology is fixed, but i want to see if node ages are included here too
+monitors.append( mnFile(filename="vit-bdp-pruned.tre", printgen=100, bd_tree) )
+#we can also set up a screen monitor
+monitors.append( mnScreen(printgen=1000, bd_tree) )
+
+mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine='mixed')
+
+# Run the MCMC #
+mymcmc.run(generations=2000000)
