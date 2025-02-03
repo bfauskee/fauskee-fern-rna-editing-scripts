@@ -54,41 +54,11 @@ A_shastense_cds <- subset(A_shastense_cds, gene!="chlL")
 Manually input intron ranges
 
 
-A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 215 & A_shastense_cds$position <= 414, "intron", 
-
 For a plastome analysis, use this block (adjust as needed)
 ```{r}
 
 A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "ycf3" & A_shastense_cds$position >= 226 & A_shastense_cds$position <= 961, "intron", ifelse(A_shastense_cds$gene == "ycf3" & A_shastense_cds$position >= 1191 & A_shastense_cds$position <= 1815, "intron", ifelse(A_shastense_cds$gene == "clpP" & A_shastense_cds$position >= 172 & A_shastense_cds$position <= 899, "intron",  ifelse(A_shastense_cds$gene == "clpP" & A_shastense_cds$position >= 1192 & A_shastense_cds$position <= 1786, "intron", ifelse(A_shastense_cds$gene == "petD" & A_shastense_cds$position >= 109 & A_shastense_cds$position <= 740, "intron", ifelse(A_shastense_cds$gene == "atpF" & A_shastense_cds$position >= 246 & A_shastense_cds$position <= 964, "intron", ifelse(A_shastense_cds$gene == "petB" & A_shastense_cds$position >= 108 & A_shastense_cds$position <= 818, "intron", ifelse(A_shastense_cds$gene == "rpoC1" & A_shastense_cds$position >= 533 & A_shastense_cds$position <= 1205, "intron", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 218 & A_shastense_cds$position <= 417, "intron", ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 650 & A_shastense_cds$position <= 1205, "intron", ifelse(A_shastense_cds$gene == "ndhA" & A_shastense_cds$position >= 659 & A_shastense_cds$position <= 1553, "intron", ifelse(A_shastense_cds$gene == "ndhB" & A_shastense_cds$position >= 827 & A_shastense_cds$position <= 1680, "intron", ifelse(A_shastense_cds$gene == "rpl16" & A_shastense_cds$position >= 107 & A_shastense_cds$position <= 506, "intron", ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 498 & A_shastense_cds$position <= 1246, "intron", "exon"))))))))))))))))
 ```
-rpl2
-ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 498 & A_shastense_cds$position <= 1145, "intron",
-rpl16
-ifelse(A_shastense_cds$gene == "rpl16" & A_shastense_cds$position >= 110 & A_shastense_cds$position <= 912, "intron",
-ndh genes
-ifelse(A_shastense_cds$gene == "ndhA" & A_shastense_cds$position >= 659 & A_shastense_cds$position <= 1680, "intron"
-ifelse(A_shastense_cds$gene == "ndhB" & A_shastense_cds$position >= 824 & A_shastense_cds$position <= 1729, "intron",
-rps12, add if annotated
-ifelse(A_shastense_cds$gene == "rps12" & A_shastense_cds$position >= 215 & A_shastense_cds$position <= 414, "intron",
-rps16, if annotated
-ifelse(A_shastense_cds$gene == "rps16" & A_shastense_cds$position >= 143 & A_shastense_cds$position <= 897, "intron", 
-For a mitochondiral analysis, use this block (adjust as needed)
-rps16, add if annotated
-ifelse(A_shastense_cds$gene == "rps16" & A_shastense_cds$position >= 143 & A_shastense_cds$position <= 939, "intron",
-ycf66
-ifelse(A_shastense_cds$gene == "ycf66" & A_shastense_cds$position >= 206 & A_shastense_cds$position <= 931, "intron",
-A_shastense_cds$genic_region <- ifelse(A_shastense_cds$position < 101, "UTR", ifelse( A_shastense_cds$position > A_shastense_cds$gene_length - 100, "UTR", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 362 & A_shastense_cds$position <= 1791, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 1928 & A_shastense_cds$position <= 5215, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 5299 & A_shastense_cds$position <= 6969, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 7162 & A_shastense_cds$position <= 11062, "intron", ifelse(A_shastense_cds$gene == "nad1" & A_shastense_cds$position >= 11122 & A_shastense_cds$position <= 15055, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 257 & A_shastense_cds$position <= 1851, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 2238 & A_shastense_cds$position <= 5067, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 5235 & A_shastense_cds$position <= 7251, "intron", ifelse(A_shastense_cds$gene == "nad2" & A_shastense_cds$position >= 7825 & A_shastense_cds$position <= 9777, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 331 & A_shastense_cds$position <= 1397, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 2410 & A_shastense_cds$position <= 3666, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 3880 & A_shastense_cds$position <= 11251, "intron", ifelse(A_shastense_cds$gene == "nad5" & A_shastense_cds$position >= 11645 & A_shastense_cds$position <= 12231, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 241 & A_shastense_cds$position <= 1348, "intron",ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 1418 & A_shastense_cds$position <= 2708, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 3186 & A_shastense_cds$position <= 4658, "intron", ifelse(A_shastense_cds$gene == "nad7" & A_shastense_cds$position >= 4893 & A_shastense_cds$position <= 8186, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 565 & A_shastense_cds$position <= 4023, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 4539 & A_shastense_cds$position <= 7376, "intron", ifelse(A_shastense_cds$gene == "nad4" & A_shastense_cds$position >= 7780 & A_shastense_cds$position <= 11069, "intron", ifelse(A_shastense_cds$gene == "rps3" & A_shastense_cds$position >= 175 & A_shastense_cds$position <= 2359, "intron", ifelse(A_shastense_cds$gene == "rps3" & A_shastense_cds$position >= 2648 & A_shastense_cds$position <= 4890, "intron", ifelse(A_shastense_cds$gene == "ccmFC" & A_shastense_cds$position >= 1036 & A_shastense_cds$position <= 2716, "intron", ifelse(A_shastense_cds$gene == "cox1" & A_shastense_cds$position >= 725 & A_shastense_cds$position <= 1840, "intron",ifelse(A_shastense_cds$gene == "rpl2" & A_shastense_cds$position >= 530 & A_shastense_cds$position <= 1284, "intron", "exon")))))))))))))))))))))))))))
-
-
-A_shastense_cds_b$genic_region <-  ifelse(A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position < 101, "UTR", ifelse(A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position > 979, "UTR", "exon"))
-A_shastense_cds <- rbind(A_shastense_cds, A_shastense_cds_b)
-
-
-If subsetting is needed, due to less than 100bp flanking regions on either side or simple misannotation, adapt the below code.
-
-A_shastense_cds_b$genic_region <-  ifelse(A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position < 94, "UTR", ifelse(A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position >= 820 & A_shastense_cds_b$position <= 1604, "intron", ifelse(A_shastense_cds_b$gene == "rpl23" & A_shastense_cds_b$position < 46, "UTR", ifelse( A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 16, "UTR", ifelse( A_shastense_cds_b$gene == "ndhB" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 100, "UTR", ifelse( A_shastense_cds_b$gene == "chlL" & A_shastense_cds_b$position < 101, "UTR", ifelse( A_shastense_cds_b$gene == "rpl23" & A_shastense_cds_b$position > A_shastense_cds_b$gene_length - 100,  "UTR", "exon")))))))
-A_shastense_cds <- rbind(A_shastense_cds, A_shastense_cds_b)
-
 
 Now identify coding sections of the gene. In most cases this will involve only denoting the first and last 100 bases as noncoding. Could be more difficult with multi-exon genes.
 ```{r}
@@ -185,28 +155,29 @@ A_shastense_final_r$AA_change <- case_when(A_shastense_final_r$edit == "c-to-u" 
    TRUE ~ "NA")
 ```
 
+Write csv outputs, adjust path.
 ```{r}
-write.csv(A_shastense_final_r, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_final_r.csv")
+write.csv(A_shastense_final_r, "{path}A_shastense_final_r.csv")
 ```
 
 Now go after the non coding editing sites
 ```{r}
 A_shastense_noncoding <- A_shastense_cds[!grepl("no", A_shastense_cds$edit),]
 A_shastense_noncoding <- A_shastense_noncoding[!grepl("exon", A_shastense_noncoding$genic_region),]
-write.csv(A_shastense_noncoding, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_final_r_noncoding.csv")
+write.csv(A_shastense_noncoding, "{path}/A_shastense_final_r_noncoding.csv")
 ```
 
 And now the tRNAs
 ```{r}
 A_shastense_tRNA <- A_shastense[grepl("^trn", A_shastense$gene),]
 A_shastense_tRNA <- A_shastense_tRNA[!grepl("no", A_shastense_tRNA$edit),]
-write.csv(A_shastense_tRNA, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_tRNA_r.csv")
+write.csv(A_shastense_tRNA, "{path}A_shastense_tRNA_r.csv")
 ```
 
 Let's create another file containing only the edits
 ```{r}
 A_shastense_editsonly <- A_shastense_final_r[!grepl("no", A_shastense_final_r$edit),]
 
-write.csv(A_shastense_editsonly, "/Users/blakefauskee/Dropbox (Duke Bio_Ea)/Main_RNA_editing/equisetum/A_shastense_editsonly.csv")
+write.csv(A_shastense_editsonly, "{path}A_shastense_editsonly.csv")
 ```
 
