@@ -1,5 +1,5 @@
-# fauskee-fern-rna-editing-scripts
-Data from Fauskee et al. 2025: Comparative phylogeneyic analyses of RNA editing in fern plastomes suggest possible adaptive innovations
+# Scripts and (some) data from Fauskee et al. 2025 — Comparative phylogeneyic analyses of RNA editing in fern plastomes suggest possible adaptive innovations
+This repo contains scripts and some data from "Comparative phylogenetic analyses of RNA editing in fern plastomes suggest possible adaptive innovations" by Blake D. Fauskee, Li-Yaung Kuo, Tracy A. Heath and Kathleen M. Pryer
 Scripts: = scripts used for analysis, .Rev files are RevBayes scripts used for comparative analyses, RNA_editing_detection.sh maps RNA reads to plastid coding sequences, RNA_editing_detetion.Rmd actually detects the editing sites, interprets their amino acid change, and more
 ## Scripts
 ### Birth-death
